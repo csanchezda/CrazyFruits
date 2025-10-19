@@ -46,14 +46,14 @@ def generar_fruta(frame_width, dificultad=1):
     velocidad = random.randint(3, 5) * dificultad
     return Fruta(x, y, tipo, velocidad)
 
-def fruta_atrapada(fruta, basket_x, basket_y, basket_width, boca_abierta):
+def fruta_atrapada_por_boca(fruta, boca_x, boca_y, boca_radio, boca_abierta):
     """
-    Verifica si la fruta ha sido atrapada por la cesta.
-    Solo se atrapa si la boca está abierta.
+    Verifica si la fruta está cerca de la boca abierta.
+    boca_x, boca_y: centro de la boca (aprox)
+    boca_radio: radio de proximidad para atrapar
     """
     if not boca_abierta:
         return False
-    # superposición horizontal y vertical
-    if (basket_x < fruta.x < basket_x + basket_width) and (basket_y - fruta.tam < fruta.y < basket_y):
-        return True
-    return False
+
+    distancia = ((fruta.x - boca_x) ** 2 + (fruta.y - boca_y) ** 2) ** 0.5
+    return distancia <= boca_radio
