@@ -2,15 +2,17 @@ import cv2
 from camera_utils import inicializar_camara
 from detectors import cargar_cascades, detectar_boca
 from fruta import Fruta, generar_fruta, fruta_atrapada_por_boca
-from draw_utils import dibujar_face  # solo para dibujar el rectángulo de la cara
+from draw_utils import dibujar_face
+from particulas import Particula
+import random
 
-BUFFER_SIZE = 5  # número de frames para suavizar boca
+BUFFER_SIZE = 5  # frames para suavizar boca
 frame_counter = 0
-generar_cada = 50  # cada cuántos frames generar fruta
+generar_cada = 50
 dificultad = 1
 
-# Lista de frutas
 frutas = []
+particulas = []
 
 def procesar_cara(frame, face_cascade):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -20,7 +22,7 @@ def procesar_cara(frame, face_cascade):
         x, y, w, h = faces[0]
         dibujar_face(frame, x, y, w, h)
         boca_x = x + w // 2
-        boca_y = y + int(h*0.75)  # centro aproximado de la boca
+        boca_y = y + int(h*0.75)
         cv2.circle(frame, (boca_x, boca_y), 5, (0, 255, 255), -1)
         face_roi_gray = gray[y + int(h*0.55):y + h, x:x + w]
         return frame, face_roi_gray, boca_x, boca_y
@@ -42,11 +44,11 @@ def procesar_boca_y_texto(frame, boca_abierta):
     return frame
 
 def procesar_frame(frame, face_cascade, mouth_cascade, mouth_states, score):
-    global frame_counter, frutas
+    global frame_counter, frutas, particulas
     frame = cv2.flip(frame, 1)
     frame, face_roi_gray, boca_x, boca_y = procesar_cara(frame, face_cascade)
 
-    # Detección de boca con suavizado
+    # Boca abierta
     if face_roi_gray is not None:
         is_open = detectar_boca(face_roi_gray, mouth_cascade)
         boca_abierta = boca_abierta_promediada(is_open, mouth_states)
@@ -54,7 +56,7 @@ def procesar_frame(frame, face_cascade, mouth_cascade, mouth_states, score):
     else:
         boca_abierta = False
 
-    # Generar frutas cada ciertos frames
+    # Generar frutas
     frame_counter += 1
     if frame_counter % generar_cada == 0:
         frutas.append(generar_fruta(frame.shape[1], dificultad))
@@ -64,20 +66,30 @@ def procesar_frame(frame, face_cascade, mouth_cascade, mouth_states, score):
         fruta.mover()
         fruta.dibujar(frame)
 
-    # Eliminar frutas atrapadas por la boca o fuera de pantalla
+    # Verificar frutas atrapadas
     nuevas_frutas = []
     for fruta in frutas:
         if boca_x is not None and boca_y is not None and fruta_atrapada_por_boca(fruta, boca_x, boca_y, 50, boca_abierta):
             score[0] += fruta.puntaje
+            # Crear partículas
+            particulas.extend([Particula(fruta.x, fruta.y, fruta.color) for _ in range(15)])
         elif fruta.fuera_de_pantalla(frame.shape[0]):
             continue
         else:
             nuevas_frutas.append(fruta)
     frutas = nuevas_frutas
 
+    # Mover y dibujar partículas
+    nuevas_particulas = []
+    for p in particulas:
+        p.mover()
+        if p.vida > 0:
+            p.dibujar(frame)
+            nuevas_particulas.append(p)
+    particulas = nuevas_particulas
+
     # Mostrar puntaje
     cv2.putText(frame, f"Puntaje: {score[0]}", (20, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-
     return frame
 
 def main():
@@ -93,7 +105,7 @@ def main():
             break
 
         frame = procesar_frame(frame, face_cascade, mouth_cascade, mouth_states, score)
-        cv2.imshow("CrazyBasket - Fase 2", frame)
+        cv2.imshow("CrazyBasket - Fase 2 Partículas", frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
