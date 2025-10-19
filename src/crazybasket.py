@@ -1,26 +1,7 @@
-import os
 import cv2
-
-def cargar_cascades():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    mouth_cascade = cv2.CascadeClassifier(os.path.join(script_dir, "haarcascade_mcs_mouth.xml"))
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-    if mouth_cascade.empty() or face_cascade.empty():
-        raise RuntimeError("No se pudieron cargar los cascades")
-    return face_cascade, mouth_cascade
-
-def inicializar_camara():
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        raise RuntimeError("No se pudo abrir la cámara")
-    return cap
-
-def detectar_boca(face_roi_gray, mouth_cascade):
-    mouths = mouth_cascade.detectMultiScale(face_roi_gray, 1.5, 11)
-    return len(mouths) == 0  # True si boca abierta
-
-def dibujar_cesta(frame, basket_x, basket_y, basket_width=120, basket_height=25):
-    cv2.rectangle(frame, (basket_x, basket_y), (basket_x + basket_width, basket_y + basket_height), (0, 255, 0), -1)
+from camera_utils import inicializar_camara
+from detectors import cargar_cascades, detectar_boca
+from draw_utils import dibujar_cesta, dibujar_face
 
 def procesar_frame(frame, face_cascade, mouth_cascade, smooth_x, alpha):
     frame = cv2.flip(frame, 1)
@@ -31,10 +12,7 @@ def procesar_frame(frame, face_cascade, mouth_cascade, smooth_x, alpha):
     
     if len(faces) > 0:
         x, y, w, h = faces[0]
-        face_center_x = x + w // 2
-
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 150, 0), 2)
-        cv2.line(frame, (face_center_x, 0), (face_center_x, frame_height), (0, 255, 255), 1)
+        face_center_x = dibujar_face(frame, x, y, w, h)
 
         target_x = int(face_center_x / frame_width * (frame_width - 120))
         smooth_x = target_x if smooth_x is None else int(smooth_x * (1 - alpha) + target_x * alpha)
