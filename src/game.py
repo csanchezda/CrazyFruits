@@ -3,11 +3,12 @@ from fruta import Fruta, generar_fruta, fruta_atrapada_por_boca
 from draw_utils import dibujar_face
 from particulas import Particula
 from detectors import detectar_boca
+from vida import Vida
 
 BUFFER_SIZE = 5
 
 class CrazyBasketGame:
-    def __init__(self, face_cascade, mouth_cascade, frame_width, frame_height):
+    def __init__(self, face_cascade, mouth_cascade, frame_width, frame_height, vidas=3):
         self.face_cascade = face_cascade
         self.mouth_cascade = mouth_cascade
         self.frame_width = frame_width
@@ -17,9 +18,11 @@ class CrazyBasketGame:
         self.particulas = []
         self.mouth_states = []
         self.score = 0
+        self.vidas = Vida(vidas)
         self.frame_counter = 0
         self.generar_cada = 50
         self.dificultad = 1
+        self.game_over = False  # nuevo flag
 
     def boca_abierta_promediada(self, is_open):
         self.mouth_states.append(is_open)
@@ -51,6 +54,11 @@ class CrazyBasketGame:
 
     def procesar_frame(self, frame):
         frame = cv2.flip(frame, 1)
+
+        if self.game_over:
+            self.mostrar_game_over(frame)
+            return frame
+
         frame, face_roi_gray, boca_x, boca_y = self.procesar_cara(frame)
 
         # Boca abierta
@@ -71,15 +79,16 @@ class CrazyBasketGame:
             fruta.mover()
             fruta.dibujar(frame)
 
-        # Verificar frutas atrapadas
+        # Verificar frutas atrapadas y fuera de pantalla
         nuevas_frutas = []
         for fruta in self.frutas:
             if boca_x is not None and boca_y is not None and fruta_atrapada_por_boca(fruta, boca_x, boca_y, 50, boca_abierta):
                 self.score += fruta.puntaje
-                # Crear partículas
                 self.particulas.extend([Particula(fruta.x, fruta.y, fruta.color) for _ in range(15)])
             elif fruta.fuera_de_pantalla(frame.shape[0]):
-                continue
+                self.vidas.perder_vida()
+                if self.vidas.actual <= 0:
+                    self.game_over = True
             else:
                 nuevas_frutas.append(fruta)
         self.frutas = nuevas_frutas
@@ -93,6 +102,18 @@ class CrazyBasketGame:
                 nuevas_particulas.append(p)
         self.particulas = nuevas_particulas
 
-        # Mostrar puntaje
-        cv2.putText(frame, f"Puntaje: {self.score}", (20, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        # Mostrar puntaje y vidas
+        cv2.putText(frame, f"Puntaje: {self.score}", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        self.vidas.dibujar(frame, x=20, y=120)
+
         return frame
+    
+    def mostrar_game_over(self, frame):
+        frame[:] = (0, 0, 0)  # fondo negro
+        h, w = frame.shape[:2]
+        cv2.putText(frame, "GAME OVER", (w//4, h//2 - 50),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
+        cv2.putText(frame, f"Puntaje final: {self.score}", (w//4, h//2 + 50),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 3)
+        cv2.putText(frame, "Presiona 'q' para salir", (w//4, h//2 + 120),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
