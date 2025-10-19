@@ -2,7 +2,7 @@
 import cv2
 from detectors import cargar_cascades
 from camera_utils import inicializar_camara
-from game import CrazyBasketGame
+from game import CrazyFruitsGame
 import graphics
 
 # -------------------------------
@@ -49,11 +49,11 @@ def main():
     menu_frame = frame.copy()
 
     # Crear ventana y callback
-    cv2.namedWindow("CrazyBasket")
-    cv2.setMouseCallback("CrazyBasket", click_event)
+    cv2.namedWindow("CrazyFruits")
+    cv2.setMouseCallback("CrazyFruits", click_event)
 
     # Instanciar juego
-    game = CrazyBasketGame(face_cascade, mouth_cascade, w, h)
+    game = CrazyFruitsGame(face_cascade, mouth_cascade, w, h)
 
     while True:
         ret, frame = cap.read()
@@ -65,17 +65,17 @@ def main():
         # -------------------------------
         if estado == "MENU":
             graphics.dibujar_menu(menu_frame, menu_opciones, menu_rects)
-            cv2.imshow("CrazyBasket", menu_frame)
+            cv2.imshow("CrazyFruits", menu_frame)
 
         elif estado == "JUEGO":
             frame = game.procesar_frame(frame)
-            cv2.imshow("CrazyBasket", frame)
+            cv2.imshow("CrazyFruits", frame)
             if game.game_over:
                 estado = "GAME_OVER"
 
         elif estado == "GAME_OVER":
             game.mostrar_game_over(frame)
-            cv2.imshow("CrazyBasket", frame)
+            cv2.imshow("CrazyFruits", frame)
 
         elif estado == "SALIR":
             break

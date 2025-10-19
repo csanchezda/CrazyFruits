@@ -8,7 +8,7 @@ import graphics
 
 BUFFER_SIZE = 5
 
-class CrazyBasketGame:
+class CrazyFruitsGame:
     def __init__(self, face_cascade, mouth_cascade, frame_width, frame_height, vidas=3):
         self.face_cascade = face_cascade
         self.mouth_cascade = mouth_cascade
