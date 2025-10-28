@@ -12,7 +12,7 @@ class Fruta:
     def puntaje_por_tipo(self, tipo):
         puntajes = {
             'manzana': 10,
-            'banana': 5,
+            'platano': 5,
             'naranja': 8
         }
         return puntajes.get(tipo, 0)
@@ -24,10 +24,10 @@ class Fruta:
         return self.y - self.tam // 2 > frame_height
 
 def generar_fruta(frame_width, dificultad=1):
-    """Genera una nueva fruta en posición aleatoria arriba de la pantalla."""
+    # Genera una nueva fruta en posición aleatoria arriba de la pantalla.
     x = random.randint(50, frame_width - 50)
     y = -40  # comienza fuera de la pantalla
-    tipos = ['manzana', 'banana', 'naranja']
+    tipos = ['manzana', 'platano', 'naranja']
     tipo = random.choice(tipos)
     velocidad = random.randint(3, 5) * dificultad
     return Fruta(x, y, tipo, velocidad)
