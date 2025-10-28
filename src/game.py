@@ -1,4 +1,5 @@
 # game.py
+
 import cv2
 from fruta import Fruta, generar_fruta, atrapada_por_boca
 from particulas import Particula

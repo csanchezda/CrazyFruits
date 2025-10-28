@@ -1,10 +1,12 @@
+# fruta.py
+
 import random
 
 class Fruta:
     def __init__(self, x, y, tipo, velocidad, tam, puntaje):
         self.x = x
         self.y = y
-        self.tipo = tipo          # 'sandia', 'platano', 'manzana'
+        self.tipo = tipo # 'sandia', 'platano', 'manzana'
         self.velocidad = velocidad
         self.tam = tam
         self.puntaje = puntaje

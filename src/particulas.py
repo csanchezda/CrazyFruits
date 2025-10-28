@@ -1,3 +1,5 @@
+# partciulas.py
+
 import random
 
 class Particula:

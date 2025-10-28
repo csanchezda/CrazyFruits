@@ -1,4 +1,5 @@
 # main.py
+
 import cv2
 from detectors import cargar_cascades
 from camera_utils import inicializar_camara

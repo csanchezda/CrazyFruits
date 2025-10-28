@@ -1,3 +1,5 @@
+# camera_utils.py
+
 import cv2
 
 def inicializar_camara(cam_index=0):
