@@ -14,6 +14,7 @@ def dibujar_face(frame, x, y, w, h):
     cv2.line(frame, (face_center_x, 0), (face_center_x, frame.shape[0]), (0, 255, 255), 1)
     return face_center_x
 
+
 def dibujar_boca(frame, x, y, radio=5, color=(0, 255, 255)):
     """
     Dibuja un punto en la posición de la boca.
@@ -26,6 +27,7 @@ def dibujar_boca(frame, x, y, radio=5, color=(0, 255, 255)):
 def dibujar_puntaje(frame, score, x=20, y=80, color=(0, 255, 0)):
     cv2.putText(frame, f"Puntaje: {score}", (x, y),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+
 
 def dibujar_vidas(frame, vidas_actual, vidas_total, x=20, y=20):
     """
@@ -63,18 +65,21 @@ def dibujar_menu(frame, opciones, menu_rects):
 # Dibujo de frutas
 # -------------------------------
 FRUTA_COLORES = {
-    'manzana': (0, 255, 0),
-    'banana': (255, 255, 0),
-    'naranja': (0, 165, 255)
+    'sandia': (0, 0, 255),      # rojo
+    'platano': (0, 255, 255),   # amarillo
+    'manzana': (0, 200, 0)      # verde
 }
 
 def dibujar_fruta(frame, fruta):
+    """
+    Dibuja la fruta con color y tamaño según su tipo.
+    """
     color = FRUTA_COLORES.get(fruta.tipo, (255, 255, 255))
-    cv2.circle(frame, (fruta.x, fruta.y), fruta.tam // 2, color, -1)
+    cv2.circle(frame, (int(fruta.x), int(fruta.y)), fruta.tam // 2, color, -1)
 
 # -------------------------------
 # Dibujo de partículas
 # -------------------------------
 def dibujar_particula(frame, particula):
     if particula.vida > 0:
-        cv2.circle(frame, (particula.x, particula.y), 3, particula.color, -1)
+        cv2.circle(frame, (int(particula.x), int(particula.y)), 3, particula.color, -1)
