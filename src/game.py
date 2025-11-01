@@ -10,7 +10,7 @@ import graphics
 BUFFER_SIZE = 5
 
 class CrazyFruitsGame:
-    def __init__(self, face_cascade, mouth_cascade, frame_width, frame_height, vidas=3):
+    def __init__(self, face_cascade, mouth_cascade, frame_width, frame_height):
         self.face_cascade = face_cascade
         self.mouth_cascade = mouth_cascade
         self.frame_width = frame_width
@@ -20,7 +20,7 @@ class CrazyFruitsGame:
         self.particulas = []
         self.mouth_states = []
         self.score = 0
-        self.vidas = Vida(vidas)
+        self.vidas = Vida(3)
         self.frame_counter = 0
         self.generar_cada = 50
         self.dificultad = 1
@@ -51,9 +51,36 @@ class CrazyFruitsGame:
             face_roi_gray = gray[y + int(h*0.55):y + h, x:x + w]
             return frame, face_roi_gray, boca_x, boca_y
         else:
-            cv2.putText(frame, "Cara no detectada", (20, 40),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            # Mensaje de advertencia con estilo moderno
+            sombra_color = (30, 30, 30)
+            texto_color = (255, 220, 100)  # Amarillo claro elegante
+
+            # Sombra del texto
+            cv2.putText(
+                frame,
+                "Cara no detectada",
+                (22, 42),
+                cv2.FONT_HERSHEY_DUPLEX,
+                0.8,
+                sombra_color,
+                2,
+                cv2.LINE_AA
+            )
+
+            # Texto principal
+            cv2.putText(
+                frame,
+                "Cara no detectada",
+                (20, 40),
+                cv2.FONT_HERSHEY_DUPLEX,
+                0.8,
+                texto_color,
+                1,
+                cv2.LINE_AA
+            )
+
             return frame, None, None, None
+
 
     # -------------------------------
     # Procesamiento de un frame completo
@@ -112,7 +139,8 @@ class CrazyFruitsGame:
 
         # Dibujar puntaje y vidas usando graphics.py
         graphics.dibujar_puntaje(frame, self.score, x=20, y=80)
-        graphics.dibujar_vidas(frame, self.vidas.actual, self.vidas.total, x=20, y=120)
+        graphics.dibujar_vidas(frame, self.vidas.actual, x=20, y=100, animaciones=self.vidas.animaciones)
+
 
         return frame
 
