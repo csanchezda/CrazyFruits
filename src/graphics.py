@@ -4,12 +4,14 @@ import os
 import time
 import math
 
-# -------------------------------
-# Cargar imagen del corazón
-# -------------------------------
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-HEART_PATH = os.path.join(SCRIPT_DIR, "../asserts/heart.png")
+HEART_PATH = os.path.join(SCRIPT_DIR, "../asserts/icons/heart.png")
 HEART_IMG = cv2.imread(HEART_PATH, cv2.IMREAD_UNCHANGED)
+ICON_PATH_ON = os.path.join(SCRIPT_DIR, "../asserts/icons/sound_on.png")
+ICON_PATH_OFF = os.path.join(SCRIPT_DIR, "../asserts/icons/sound_off.png")
+ICON_ON = cv2.imread(ICON_PATH_ON, cv2.IMREAD_UNCHANGED)
+ICON_OFF = cv2.imread(ICON_PATH_OFF, cv2.IMREAD_UNCHANGED)
 
 # -------------------------------
 # Dibujo de cara y boca
@@ -171,6 +173,27 @@ def dibujar_menu(frame, opciones, menu_rects):
     menu_rects.clear()
     menu_rects.extend(rects)
     return frame
+
+
+# -------------------------------
+# Icono de sonido
+# -------------------------------
+
+
+def dibujar_icono_sonido(frame, muted, x=20, y=20, tam=40):
+    icon = ICON_OFF if muted else ICON_ON
+    if icon is None:
+        print("Icono de sonido no encontrado, usando texto.")
+        cv2.putText(frame, "Mute" if muted else "Sound", (x, y+30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        return (x, y, x+tam, y+tam)
+    
+    icon = cv2.resize(icon, (tam, tam))
+    h, w = icon.shape[:2]
+    alpha = icon[:, :, 3] / 255.0
+    for c in range(3):
+        frame[y:y+h, x:x+w, c] = alpha * icon[:, :, c] + (1 - alpha) * frame[y:y+h, x:x+w, c]
+    return (x, y, x+tam, y+tam)
 
 # -------------------------------
 # Dibujo de frutas

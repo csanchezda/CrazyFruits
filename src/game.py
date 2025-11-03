@@ -1,10 +1,9 @@
-# game.py
-
 import cv2
 from fruta import Fruta, generar_fruta, atrapada_por_boca
 from particulas import Particula
 from detectors import detectar_boca
 from vida import Vida
+from sound_manager import SoundManager
 import graphics
 
 BUFFER_SIZE = 5
@@ -26,6 +25,9 @@ class CrazyFruitsGame:
         self.dificultad = 1
         self.game_over = False
 
+        # Sonidos
+        self.sonidos = SoundManager()
+
     # -------------------------------
     # Lógica de boca
     # -------------------------------
@@ -46,41 +48,18 @@ class CrazyFruitsGame:
             x, y, w, h = faces[0]
             face_center_x = graphics.dibujar_face(frame, x, y, w, h)
             boca_x = x + w // 2
-            boca_y = y + int(h*0.75)
+            boca_y = y + int(h * 0.75)
             graphics.dibujar_boca(frame, boca_x, boca_y)
-            face_roi_gray = gray[y + int(h*0.55):y + h, x:x + w]
+            face_roi_gray = gray[y + int(h * 0.55):y + h, x:x + w]
             return frame, face_roi_gray, boca_x, boca_y
         else:
-            # Mensaje de advertencia con estilo moderno
             sombra_color = (30, 30, 30)
-            texto_color = (255, 220, 100)  # Amarillo claro elegante
-
-            # Sombra del texto
-            cv2.putText(
-                frame,
-                "Cara no detectada",
-                (22, 42),
-                cv2.FONT_HERSHEY_DUPLEX,
-                0.8,
-                sombra_color,
-                2,
-                cv2.LINE_AA
-            )
-
-            # Texto principal
-            cv2.putText(
-                frame,
-                "Cara no detectada",
-                (20, 40),
-                cv2.FONT_HERSHEY_DUPLEX,
-                0.8,
-                texto_color,
-                1,
-                cv2.LINE_AA
-            )
-
+            texto_color = (255, 220, 100)
+            cv2.putText(frame, "Cara no detectada", (22, 42),
+                        cv2.FONT_HERSHEY_DUPLEX, 0.8, sombra_color, 2, cv2.LINE_AA)
+            cv2.putText(frame, "Cara no detectada", (20, 40),
+                        cv2.FONT_HERSHEY_DUPLEX, 0.8, texto_color, 1, cv2.LINE_AA)
             return frame, None, None, None
-
 
     # -------------------------------
     # Procesamiento de un frame completo
@@ -116,13 +95,16 @@ class CrazyFruitsGame:
         for fruta in self.frutas:
             if boca_x is not None and boca_y is not None and atrapada_por_boca(fruta, boca_x, boca_y, 50, boca_abierta):
                 self.score += fruta.puntaje
+                self.sonidos.play_comer()
                 self.particulas.extend([
                     Particula(fruta.x, fruta.y, graphics.FRUTA_COLORES.get(fruta.tipo, (255, 255, 255)))
                     for _ in range(15)
                 ])
             elif fruta.fuera_de_pantalla(frame.shape[0]):
                 self.vidas.perder_vida()
+                self.sonidos.play_perder()
                 if self.vidas.actual <= 0:
+                    self.sonidos.play_game_over()
                     self.game_over = True
             else:
                 nuevas_frutas.append(fruta)
@@ -137,10 +119,9 @@ class CrazyFruitsGame:
                 nuevas_particulas.append(p)
         self.particulas = nuevas_particulas
 
-        # Dibujar puntaje y vidas usando graphics.py
+        # Dibujar puntaje y vidas
         graphics.dibujar_puntaje(frame, self.score, x=20, y=80)
         graphics.dibujar_vidas(frame, self.vidas.actual, x=20, y=100, animaciones=self.vidas.animaciones)
-
 
         return frame
 
