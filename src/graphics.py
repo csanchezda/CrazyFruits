@@ -3,6 +3,8 @@ import cv2
 import os
 import time
 import math
+import numpy as np
+# -------------------------------
 
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -148,31 +150,77 @@ def dibujar_vidas(frame, vidas_actual, x=30, y=80, animaciones=None):
 # -------------------------------
 # Dibujo de menú
 # -------------------------------
-def dibujar_menu(frame, opciones, menu_rects):
-    """Dibuja el menú principal con las opciones."""
-    frame[:] = (50, 50, 50)  # fondo gris
+
+def dibujar_menu(frame, opciones, menu_rects, nombre_jugador):
     h, w = frame.shape[:2]
-    rects = []
 
-    for i, texto in enumerate(opciones):
-        x1, y1 = int(w * 0.35), int(h * (0.4 + i * 0.2))
-        x2, y2 = int(w * 0.65), int(h * (0.5 + i * 0.2))
+    # --- Fondo degradado claro (violeta a turquesa pastel) ---
+    fondo = np.zeros_like(frame, dtype=np.uint8)
+    for i in range(h):
+        r = int(150 + i * 0.05)   # rosa pastel
+        g = int(200 + i * 0.1)    # verde suave
+        b = int(255 - i * 0.05)   # azul claro
+        cv2.line(fondo, (0, i), (w, i), (b, g, r), 1)
+    # Menos transparencia: 0.7 (más visible)
+    frame[:] = cv2.addWeighted(fondo, 0.7, frame, 0.3, 0)
 
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (100, 100, 255), -1)
-        cv2.putText(
-            frame,
-            texto,
-            (x1 + 20, y1 + 40),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            (255, 255, 255),
-            2
-        )
-        rects.append((x1, y1, x2, y2))
+    # --- Título ---
+    titulo = "CRAZY FRUITS"
+    font = cv2.FONT_HERSHEY_DUPLEX
+    sombra = (100, 100, 100)
+    color_principal = (0, 255, 200)
+    glow = (255, 180, 240)
 
+    (tw, th), _ = cv2.getTextSize(titulo, font, 2, 4)
+    cx, cy = (w - tw)//2, int(h*0.25)
+    cv2.putText(frame, titulo, (cx + 3, cy + 3), font, 2, sombra, 5, cv2.LINE_AA)
+    cv2.putText(frame, titulo, (cx, cy), font, 2, glow, 3, cv2.LINE_AA)
+    cv2.putText(frame, titulo, (cx, cy), font, 2, color_principal, 2, cv2.LINE_AA)
+
+    # --- Campo para nombre ---
+    campo_w, campo_h = 420, 60
+    campo_x = (w - campo_w)//2
+    campo_y = int(h*0.45)
+    color_campo = (230, 250, 250)
+    cv2.rectangle(frame, (campo_x, campo_y), (campo_x + campo_w, campo_y + campo_h), color_campo, -1)
+    cv2.rectangle(frame, (campo_x, campo_y), (campo_x + campo_w, campo_y + campo_h), (0, 200, 180), 2)
+    texto = nombre_jugador if nombre_jugador else "Escribe tu nombre..."
+    color_texto = (60, 60, 60) if nombre_jugador else (160, 160, 160)
+    cv2.putText(frame, texto, (campo_x + 15, campo_y + 40), font, 0.9, color_texto, 2, cv2.LINE_AA)
+    campo_nombre_rect = (campo_x, campo_y, campo_x + campo_w, campo_y + campo_h)
+
+    # --- Botones ---
+    btn_w, btn_h = 300, 70
+    start_y = int(h * 0.62)
+    espacio = 90
     menu_rects.clear()
-    menu_rects.extend(rects)
-    return frame
+
+    for i, texto_btn in enumerate(opciones):
+        bx = (w - btn_w)//2
+        by = start_y + i * espacio
+        rect = (bx, by, bx + btn_w, by + btn_h)
+        menu_rects.append(rect)
+
+        color_btn = (255, 255, 255)
+        borde = (0, 255, 220)
+        cv2.rectangle(frame, (bx, by), (bx + btn_w, by + btn_h), color_btn, -1)
+        cv2.rectangle(frame, (bx, by), (bx + btn_w, by + btn_h), borde, 3)
+
+        (tw, th), _ = cv2.getTextSize(texto_btn, font, 1.1, 3)
+        tx = bx + (btn_w - tw)//2
+        ty = by + (btn_h + th)//2
+        cv2.putText(frame, texto_btn, (tx + 2, ty + 2), font, 1.1, sombra, 3, cv2.LINE_AA)
+        cv2.putText(frame, texto_btn, (tx, ty), font, 1.1, (0, 150, 130), 2, cv2.LINE_AA)
+
+    # --- Destellos suaves más lentos ---
+    tick = cv2.getTickCount() / cv2.getTickFrequency()  # tiempo en segundos
+    for i in range(6):
+        x = int((i * 120 + tick * 30) % w)  # más despacio: 30 px/s
+        y = int((i * 80 + tick * 20) % h)   # más despacio
+        cv2.circle(frame, (x, y), 3, (255, 255, 255), -1)
+        cv2.circle(frame, (x, y), 6, (255, 255, 255), 1)
+
+    return campo_nombre_rect
 
 
 # -------------------------------
