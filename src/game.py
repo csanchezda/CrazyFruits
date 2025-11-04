@@ -39,7 +39,7 @@ class CrazyFruitsGame:
         self.particulas = []
         self.mouth_states = []
         self.score = 0
-        self.vidas = Vida(6)
+        self.vidas = Vida(4)
         self.frame_counter = 0
         self.generar_cada = 30 # Frutas cada n frames
         self.dificultad = 1 

@@ -38,5 +38,35 @@
         "nombre": "Player",
         "score": 38,
         "fecha": "2025-11-04 01:51:59"
+    },
+    {
+        "nombre": "Ejemplo",
+        "score": 84,
+        "fecha": "2025-11-04 16:46:13"
+    },
+    {
+        "nombre": "Ejemplo",
+        "score": 5,
+        "fecha": "2025-11-04 16:46:56"
+    },
+    {
+        "nombre": "s",
+        "score": 6,
+        "fecha": "2025-11-04 16:49:40"
+    },
+    {
+        "nombre": "Player",
+        "score": 27,
+        "fecha": "2025-11-04 16:52:07"
+    },
+    {
+        "nombre": "Player",
+        "score": 20,
+        "fecha": "2025-11-04 16:52:29"
+    },
+    {
+        "nombre": "Player",
+        "score": 51,
+        "fecha": "2025-11-04 16:52:58"
     }
 ]

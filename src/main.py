@@ -79,7 +79,8 @@ def click_event(event, x, y, flags, param):
             if game and hasattr(game, "boton_reiniciar"):
                 x1, y1, x2, y2 = game.boton_reiniciar
                 if x1 <= x <= x2 and y1 <= y <= y2:
-                    game = CrazyFruitsGame(face_cascade, mouth_cascade, w, h, nombre_jugador=nombre_jugador, sonidos=sonidos)
+                    sonido_nuevo = SoundManager()
+                    game = CrazyFruitsGame(face_cascade, mouth_cascade, w, h, nombre_jugador=nombre_jugador, sonidos=sonido_nuevo)
                     estado = "JUEGO"
 
 # -------------------------------
