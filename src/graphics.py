@@ -354,7 +354,6 @@ FRUTA_COLORES_BGR = {
 }
 
 
-
 def dibujar_fruta(frame, fruta):
     """Dibuja una fruta usando su imagen PNG con transparencia."""
     if fruta.imagen is not None:
