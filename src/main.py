@@ -1,8 +1,19 @@
+"""
+Módulo principal del juego CrazyFruits.
+
+Responsabilidades:
+- Inicializar la cámara y los detectores (face/mouth).
+- Mostrar el menú principal y gestionar eventos de mouse/teclado.
+- Crear y manejar la instancia de `CrazyFruitsGame` durante la ejecución.
+
+"""
+
 import cv2
 from detectors import cargar_cascades
 from camera_utils import inicializar_camara
 from game import CrazyFruitsGame
 import graphics
+from sound_manager import SoundManager
 
 # -------------------------------
 # Configuración del menú
@@ -25,6 +36,17 @@ game = None
 # Callback del mouse
 # -------------------------------
 def click_event(event, x, y, flags, param):
+    """Manejador de eventos del mouse usado por la ventana OpenCV.
+
+    Detecta pulsaciones sobre:
+    - Icono de sonido (mute/unmute)
+    - Campo de texto del nombre
+    - Botones del menú (JUGAR, SALIR)
+    - Botón de reiniciar en pantalla de GAME_OVER
+
+    Las coordenadas del click se comparan contra rectángulos previamente
+    calculados y almacenados.
+    """
     global estado, sonidos, vol_rect, game, campo_activo, nombre_jugador
     if event == cv2.EVENT_LBUTTONDOWN:
         # --- Icono de sonido ---
@@ -48,8 +70,7 @@ def click_event(event, x, y, flags, param):
                 if bx1 <= x <= bx2 and by1 <= y <= by2:
                     seleccion = menu_opciones[i]
                     if seleccion == "JUGAR":
-                        game = CrazyFruitsGame(face_cascade, mouth_cascade, w, h, nombre_jugador=nombre_jugador)
-                        sonidos = game.sonidos
+                        game = CrazyFruitsGame(face_cascade, mouth_cascade, w, h, nombre_jugador=nombre_jugador, sonidos=sonidos)
                         estado = "JUEGO"
                     elif seleccion == "SALIR":
                         estado = "SALIR"
@@ -58,19 +79,27 @@ def click_event(event, x, y, flags, param):
             if game and hasattr(game, "boton_reiniciar"):
                 x1, y1, x2, y2 = game.boton_reiniciar
                 if x1 <= x <= x2 and y1 <= y <= y2:
-                    game = CrazyFruitsGame(face_cascade, mouth_cascade, w, h, nombre_jugador=nombre_jugador)
-                    sonidos = game.sonidos
+                    game = CrazyFruitsGame(face_cascade, mouth_cascade, w, h, nombre_jugador=nombre_jugador, sonidos=sonidos)
                     estado = "JUEGO"
 
 # -------------------------------
 # Función principal
 # -------------------------------
+
 def main():
+    """Función principal: inicializa recursos y ejecuta el loop principal.
+
+    - Carga los clasificadores en cascada (cara y boca).
+    - Inicia la cámara y la ventana OpenCV.
+    - Maneja estados: MENU, JUEGO, GAME_OVER, SALIR.
+    """
     global estado, sonidos, vol_rect, campo_nombre_rect, game, face_cascade, mouth_cascade, w, h, nombre_jugador
 
     # Cargar cascades y cámara
     face_cascade, mouth_cascade = cargar_cascades()
     cap = inicializar_camara()
+
+    sonidos = SoundManager()
 
     ret, frame = cap.read()
     if not ret:

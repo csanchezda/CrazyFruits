@@ -5,13 +5,33 @@
         "fecha": "2025-11-03 16:31:15"
     },
     {
-        "nombre": "Player",
+        "nombre": "Player-1",
         "score": 19,
         "fecha": "2025-11-03 16:48:49"
     },
     {
-        "nombre": "s",
+        "nombre": "Ejemplo",
         "score": 12,
         "fecha": "2025-11-03 16:55:35"
+    },
+    {
+        "nombre": "Player",
+        "score": 0,
+        "fecha": "2025-11-03 19:52:22"
+    },
+    {
+        "nombre": "Player",
+        "score": 5,
+        "fecha": "2025-11-03 19:55:46"
+    },
+    {
+        "nombre": "Player",
+        "score": 0,
+        "fecha": "2025-11-03 20:14:29"
+    },
+    {
+        "nombre": "Player",
+        "score": 106,
+        "fecha": "2025-11-03 22:41:40"
     }
 ]
