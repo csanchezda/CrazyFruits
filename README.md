@@ -79,9 +79,9 @@
 
 ### Dependencias
 ```bash
-opencv-python    # Detección facial y procesamiento de video
+opencv-python    # Detección facial, procesamiento de video y interfaz gráfica
 numpy           # Operaciones matemáticas
-pygame          # Audio e interfaz gráfica
+pygame          # Audio
 ```
 
 ---
