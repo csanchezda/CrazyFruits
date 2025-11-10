@@ -92,7 +92,7 @@ pygame          # Audio
 
 1. **Clonar el repositorio**
 ```powershell
-git clone <url-del-repo>
+git clone https://github.com/csanchezda/CrazyFruits.git
 cd CrazyFruits
 ```
 
@@ -183,23 +183,23 @@ def boca_abierta_promediada(self, is_open):
 
 **¿Cómo funciona?**
 
-1. 📸 Detecta la cara y la boca en cada frame
-2. 📏 Mide la apertura vertical de la boca
-3. 📊 Mantiene un buffer de las últimas mediciones
-4. ✅ Solo activa la acción si el promedio supera el umbral
+1.  Detecta la cara y la boca en cada frame
+2.  Mide la apertura vertical de la boca
+3.  Mantiene un buffer de las últimas mediciones
+4.  Solo activa la acción si el promedio supera el umbral
 
 **Ventajas:**
-- ✨ Evita falsos positivos por movimientos rápidos
-- 🎯 Mayor precisión en la detección
-- 🎮 Experiencia de juego más fluida
+-  Evita falsos positivos por movimientos rápidos
+-  Mayor precisión en la detección
+-  Experiencia de juego más fluida
 
 > ⚠️ **Nota**: Se usa pygame junto con OpenCV porque OpenCV por sí solo dificulta la integración de música y efectos de sonido de forma eficiente.
 
 ### Dificultad progresiva
 
-- ⚡ **Velocidad**: Aumenta gradualmente con el tiempo de juego
-- 🔄 **Frecuencia**: Generación más rápida de frutas
-- 🎯 **Variedad**: Mayor probabilidad de frutas especiales en niveles avanzados
+-  **Velocidad**: Aumenta gradualmente con el tiempo de juego
+-  **Frecuencia**: Generación más rápida de frutas
+-  **Variedad**: Mayor probabilidad de frutas especiales en niveles avanzados
 
 ---
 
